@@ -1,10 +1,9 @@
-import tkinter as tk
+from tkinter import Tk, Frame, messagebox
+
+root = Tk()
 
 
-root = tk.Tk()
-
-
-class App(tk.Frame):
+class App(Frame):
 
     def __init__(self, master):
         super().__init__(master)
@@ -31,4 +30,9 @@ class App(tk.Frame):
         self.build()
 
     def build(self):
-        pass
+        title = '开发者提示'
+        paragraph = ['由于时间有限, 没有完成这个程序', '查看更多实际效果与源码', '需移步至 private_version 分支',
+                     'Github 链接: https://github.com/YernarT/WhatsAppSender/tree/private_version']
+
+        messagebox.showinfo(
+            title, '\n\n'.join(paragraph))
