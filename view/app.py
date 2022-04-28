@@ -1,34 +1,40 @@
-import tkinter as tk
+from tkinter import Tk
+from view.get_data_area.main import GetDataArea
+from view.sending_area.main import SendingArea
 
 
-root = tk.Tk()
+class App:
 
+    def __init__(self):
 
-class App(tk.Frame):
+        root = Tk()
+        # 全局 app 对象, 用于传递 app 根组件上下文
+        self.app = {}
 
-    def __init__(self, master):
-        super().__init__(master)
+        root.resizable(False, False)
+        root.title('WhatsApp Sender')
 
-        self.master = master
-        self.master.resizable(False, False)
-        self.master.title('WhatsApp Sender')
         # 初始化 窗口位置于 屏幕正中心
+        screen_width, app_width = root.winfo_screenwidth(), 1200
+        screen_height, app_height = root.winfo_screenheight(), 650
 
-        screen_width, width = root.winfo_screenwidth(), 1080
-        screen_height, height = root.winfo_screenheight(), 640
-
-        if screen_width < width or screen_height < height:
-            print(f'设备的屏幕大小不支持, 需更换更大屏幕设备.\n最小屏幕尺寸: {width}x{height}')
+        if screen_width < app_width or screen_height < app_height:
+            print(f'设备的屏幕大小不支持, 需更换更大屏幕设备.\n最小屏幕尺寸: {app_width}x{app_height}')
             return
 
-        self.app_width, self.app_height = width, height
-        self.app_position_x, self.app_position_y = (
-            screen_width - width) // 2, (screen_height - height) // 2
-        self.master.geometry(
-            f'{self.app_width}x{self.app_height}+{self.app_position_x}+{self.app_position_y}')
+        app_position_x, app_position_y = (
+            screen_width - app_width) // 2, (screen_height - app_height) // 2
+        root.geometry(
+            f'{app_width}x{app_height}+{app_position_x}+{app_position_y}')
 
-        self.place(x=0, y=0)
+        self.app['width'], self.app['height'] = app_width, app_height
+        self.app['position_x'], self.app['position_y'] = app_position_x, app_position_y
+
+        self.app['root'] = root
+
         self.build()
+        root.mainloop()
 
     def build(self):
-        pass
+        get_data_area = GetDataArea(self.app)
+        sending_area = SendingArea(self.app)
