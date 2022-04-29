@@ -18,7 +18,7 @@ class GetDataArea:
      # Vars
     def define_vars(self):
         self.current_data_category = StringVar()
-        self.dataCountVar = StringVar(self.this, '[]')
+        self.dataCountVar = StringVar(self.this, '0')
 
         self.mock_data = [
             {
