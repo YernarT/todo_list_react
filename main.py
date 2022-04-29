@@ -1,5 +1,3 @@
-from view.app import App, root
+from view.app import App
 
-app = App(master=root)
-
-app.mainloop()
+app = App()
