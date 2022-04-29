@@ -1,4 +1,5 @@
 from tkinter import Frame, StringVar, Entry, Button, messagebox, Text
+from controller.main import send_msg_instantly
 
 
 class SendingArea:
@@ -49,6 +50,6 @@ class SendingArea:
         messagebox.showinfo('Инструкции', instruction)
 
     def handle_send(self):
-        # 调用 controller 内的 send_msg_instantly 方法
-        print('phone: ', self.phoneVar.get())
-        print('text: ', self.text.get(0.0, 'end'))
+        send_msg_instantly(self.phoneVar.get(), self.text.get(0.0, 'end'))
+
+        
