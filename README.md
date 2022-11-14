@@ -1,3 +1,11 @@
-# WhatsAppSender
+# Todo List
 
-> 自动发信息到 WhatsApp 的程序
+> interview task
+
+### tech stack:
+
+- `react-hook-form`
+- `zod`
+- `material-ui v5`
+- `notitask`
+- `react-query`
