@@ -27,10 +27,11 @@ export default memo(function TodoList({ todoList }: TodoListProps) {
 					key={todo.id}
 					secondaryAction={
 						<IconButton edge="end" aria-label="delete">
-							<DeleteIcon />
+							<DeleteIcon color="error" />
 						</IconButton>
 					}
-					disablePadding>
+					disablePadding
+					className="item">
 					<ListItemButton>
 						<ListItemText primary={todo.title} />
 					</ListItemButton>
