@@ -1,7 +1,7 @@
 export interface I_Todo {
-	id: Number;
-	title: String;
-	description: String;
+	id: number;
+	title: string;
+	description?: string;
 	status: 'Not Started' | 'In Progress' | 'Delayed' | 'On Hold' | 'Completed';
-	createTime: String;
+	createTime: string;
 }
