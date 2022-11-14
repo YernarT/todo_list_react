@@ -6,23 +6,23 @@ import { List } from '@mui/material';
 
 export const TodoListStyled = styled(List)`
 	margin-top: 8px;
+	padding-right: 8px;
 	max-height: 240px;
-	
-    overflow: hidden auto;
-    scroll-behavior: smooth;
+
+	overflow: hidden auto;
+	scroll-behavior: smooth;
 
 	&::-webkit-scrollbar-track {
-		background-color: #000;
+		background-color: rgba(0, 0, 0, 0.15);
 	}
 
 	&::-webkit-scrollbar {
-		display: none;
-		width: 0;
-		background-color: #000;
+		width: 2px;
+		background-color: transparent;
 	}
 
 	&::-webkit-scrollbar-thumb {
-		background-color: #fff;
+		background-color: #1976d2;
 	}
 
 	.item {
