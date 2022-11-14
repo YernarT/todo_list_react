@@ -34,27 +34,23 @@ const initTodoList: I_Todo[] = Array.from(Array(40).keys()).map(i => ({
 export default function App() {
 	const { enqueueSnackbar } = useSnackbar();
 	const [todoList, setTodoList] = useState<I_Todo[]>(initTodoList);
-	const {
-		register,
-		formState: { errors, isValid },
-		handleSubmit,
-	} = useForm();
+	const { register, handleSubmit } = useForm();
 
-	const addBtnRef = useRef<HTMLAnchorElement>(null);
+	const submitBtnRef = useRef<HTMLButtonElement>(null);
 
-	const handleAddTodo = (data: FieldValues) => {
-		if (isValid) {
-			console.log('data: ', data);
-		} else {
-			enqueueSnackbar(
-				(Object.values(errors)[0]?.message ||
-					'Something went wrong...') as string,
-				{
-					autoHideDuration: 3000,
-					anchorOrigin: { horizontal: 'center', vertical: 'top' },
-				},
-			);
-		}
+	const onSumbit = (data: FieldValues) => {
+		console.log('form data: ', data);
+	};
+
+	const onError = (errors: Object) => {
+		enqueueSnackbar(
+			(Object.values(errors)[0]?.message ||
+				'Something went wrong...') as string,
+			{
+				autoHideDuration: 3000,
+				anchorOrigin: { horizontal: 'center', vertical: 'top' },
+			},
+		);
 	};
 
 	return (
@@ -69,13 +65,11 @@ export default function App() {
 					</Typography>
 
 					{/* Create Todo */}
-					<form className="toolbar" onSubmit={handleSubmit(handleAddTodo)}>
+					<form className="toolbar" onSubmit={handleSubmit(onSumbit, onError)}>
 						<OutlinedInput
 							placeholder="Add your new todo"
 							size="small"
 							className="input"
-							// value={todoTitle}
-							// onChange={({ target: { value } }) => setTodoTitle(value)}
 							{...register('title', {
 								required: {
 									value: true,
@@ -88,13 +82,7 @@ export default function App() {
 							})}
 						/>
 
-						<IconButton
-							color="primary"
-							aria-label="add"
-							ref={addBtnRef}
-							href=""
-							type="submit"
-							onClick={handleAddTodo}>
+						<IconButton color="primary" ref={submitBtnRef} type="submit">
 							<AddIcon />
 						</IconButton>
 					</form>
