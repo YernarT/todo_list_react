@@ -1,8 +1,9 @@
 // Types
+import type { KeyboardEvent, MouseEvent } from 'react';
 import type { I_Todo } from './types/todo';
 
 // React
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 // UI lib
 import {
 	CssBaseline,
@@ -16,7 +17,7 @@ import { Wrapper, TodoList } from '@/components';
 // Styled components
 import { AppContainer } from './App.style';
 
-const initTodoList: I_Todo[] = Array.from(Array(4).keys()).map(i => ({
+const initTodoList: I_Todo[] = Array.from(Array(40).keys()).map(i => ({
 	id: i + 1,
 	title: 'Lorem ipsum dolor',
 	description:
@@ -26,7 +27,23 @@ const initTodoList: I_Todo[] = Array.from(Array(4).keys()).map(i => ({
 }));
 
 export default function App() {
+	const [todoTitle, setTodoTitle] = useState('');
 	const [todoList, setTodoList] = useState<I_Todo[]>(initTodoList);
+
+	const addBtnRef = useRef<HTMLAnchorElement>(null);
+
+	const handleInputKeyDown = ({ code }: KeyboardEvent) => {
+		if (code === 'Enter') {
+			// addBtnRef.current?.focus();
+			addBtnRef.current?.click();
+		}
+	};
+
+	const handleAddTodo = (e: MouseEvent) => {
+		e.preventDefault();
+
+		console.log('todoTitle: ', todoTitle);
+	};
 
 	return (
 		<>
@@ -45,9 +62,17 @@ export default function App() {
 							placeholder="Add your new todo"
 							size="small"
 							className="input"
+							value={todoTitle}
+							onChange={({ target: { value } }) => setTodoTitle(value)}
+							onKeyDown={handleInputKeyDown}
 						/>
 
-						<IconButton color="primary" aria-label="add">
+						<IconButton
+							color="primary"
+							aria-label="add"
+							ref={addBtnRef}
+							href=""
+							onClick={handleAddTodo}>
 							<AddIcon />
 						</IconButton>
 					</div>
