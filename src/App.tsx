@@ -1,9 +1,13 @@
 // Types
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { FieldValues } from 'react-hook-form';
 import type { I_Todo } from './types/todo';
 
 // React
 import { useState, useRef } from 'react';
+
+// Utils
+import { useForm } from 'react-hook-form';
+
 // UI lib
 import {
 	CssBaseline,
@@ -12,6 +16,7 @@ import {
 	OutlinedInput,
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 // Components
 import { Wrapper, TodoList } from '@/components';
 // Styled components
@@ -27,22 +32,29 @@ const initTodoList: I_Todo[] = Array.from(Array(40).keys()).map(i => ({
 }));
 
 export default function App() {
-	const [todoTitle, setTodoTitle] = useState('');
+	const { enqueueSnackbar } = useSnackbar();
 	const [todoList, setTodoList] = useState<I_Todo[]>(initTodoList);
+	const {
+		register,
+		formState: { errors, isValid },
+		handleSubmit,
+	} = useForm();
 
 	const addBtnRef = useRef<HTMLAnchorElement>(null);
 
-	const handleInputKeyDown = ({ code }: KeyboardEvent) => {
-		if (code === 'Enter') {
-			// addBtnRef.current?.focus();
-			addBtnRef.current?.click();
+	const handleAddTodo = (data: FieldValues) => {
+		if (isValid) {
+			console.log('data: ', data);
+		} else {
+			enqueueSnackbar(
+				(Object.values(errors)[0]?.message ||
+					'Something went wrong...') as string,
+				{
+					autoHideDuration: 3000,
+					anchorOrigin: { horizontal: 'center', vertical: 'top' },
+				},
+			);
 		}
-	};
-
-	const handleAddTodo = (e: MouseEvent) => {
-		e.preventDefault();
-
-		console.log('todoTitle: ', todoTitle);
 	};
 
 	return (
@@ -57,14 +69,23 @@ export default function App() {
 					</Typography>
 
 					{/* Create Todo */}
-					<div className="toolbar">
+					<form className="toolbar" onSubmit={handleSubmit(handleAddTodo)}>
 						<OutlinedInput
 							placeholder="Add your new todo"
 							size="small"
 							className="input"
-							value={todoTitle}
-							onChange={({ target: { value } }) => setTodoTitle(value)}
-							onKeyDown={handleInputKeyDown}
+							// value={todoTitle}
+							// onChange={({ target: { value } }) => setTodoTitle(value)}
+							{...register('title', {
+								required: {
+									value: true,
+									message: 'Title is required',
+								},
+								maxLength: {
+									value: 32,
+									message: 'Title maximum length is 32 characters',
+								},
+							})}
 						/>
 
 						<IconButton
@@ -72,10 +93,11 @@ export default function App() {
 							aria-label="add"
 							ref={addBtnRef}
 							href=""
+							type="submit"
 							onClick={handleAddTodo}>
 							<AddIcon />
 						</IconButton>
-					</div>
+					</form>
 
 					<TodoList todoList={todoList} />
 				</Wrapper>
