@@ -8,4 +8,15 @@ export const AppContainer = styled.div`
 
 	overflow: auto hidden;
 	position: relative;
+
+	.toolbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 8px;
+
+		.input {
+			flex: 1 1 160px;
+		}
+	}
 `;

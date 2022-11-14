@@ -35,13 +35,17 @@ export default function App() {
 			<AppContainer>
 				<Wrapper>
 					{/* Header */}
-					<Typography variant="h4" noWrap fontWeight="bolder">
+					<Typography variant="h4" noWrap fontWeight="bolder" gutterBottom>
 						Todo App
 					</Typography>
 
 					{/* Create Todo */}
 					<div className="toolbar">
-						<OutlinedInput placeholder="Add your new todo" size="small" />
+						<OutlinedInput
+							placeholder="Add your new todo"
+							size="small"
+							className="input"
+						/>
 
 						<IconButton color="primary" aria-label="add">
 							<AddIcon />
