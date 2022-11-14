@@ -25,7 +25,7 @@ import { Wrapper, TodoList } from '@/components';
 // Styled components
 import { AppContainer } from './App.style';
 
-const initTodoList: I_Todo[] = Array.from(Array(1).keys()).map(i => ({
+const initTodoList: I_Todo[] = Array.from(Array(3).keys()).map(i => ({
 	id: i + 1,
 	title: 'Lorem ipsum dolor',
 	description:
