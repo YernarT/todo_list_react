@@ -3,10 +3,13 @@ import type { FieldValues } from 'react-hook-form';
 import type { I_Todo } from './types/todo';
 
 // React
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 // Utils
 import { useForm } from 'react-hook-form';
+import { useQuery } from 'react-query';
+// API
+import { reqGetTodo } from './service/todo.api';
 
 // UI lib
 import {
@@ -22,7 +25,7 @@ import { Wrapper, TodoList } from '@/components';
 // Styled components
 import { AppContainer } from './App.style';
 
-const initTodoList: I_Todo[] = Array.from(Array(40).keys()).map(i => ({
+const initTodoList: I_Todo[] = Array.from(Array(1).keys()).map(i => ({
 	id: i + 1,
 	title: 'Lorem ipsum dolor',
 	description:
@@ -34,14 +37,32 @@ const initTodoList: I_Todo[] = Array.from(Array(40).keys()).map(i => ({
 export default function App() {
 	const { enqueueSnackbar } = useSnackbar();
 	const [todoList, setTodoList] = useState<I_Todo[]>(initTodoList);
-	const { register, handleSubmit } = useForm();
 
+	const { data, status } = useQuery('testSet', reqGetTodo, {
+		retry: 0,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		refetchIntervalInBackground: false,
+		retryOnMount: false,
+	});
+	console.log(data, status);
+
+	const { register, handleSubmit } = useForm();
 	const submitBtnRef = useRef<HTMLButtonElement>(null);
 
 	const onSumbit = (data: FieldValues) => {
 		console.log('form data: ', data);
-	};
 
+		setTodoList(prevState => [
+			...prevState,
+			{
+				id: prevState.length + 1,
+				title: data.title,
+				status: 'Not Started',
+				createTime: Date.now().toString(),
+			},
+		]);
+	};
 	const onError = (errors: Object) => {
 		enqueueSnackbar(
 			(Object.values(errors)[0]?.message ||
@@ -52,6 +73,10 @@ export default function App() {
 			},
 		);
 	};
+
+	const handleDeleteTodo = useCallback((todoId: number) => {
+		setTodoList(prevState => prevState.filter(todo => todo.id !== todoId));
+	}, []);
 
 	return (
 		<>
@@ -87,7 +112,7 @@ export default function App() {
 						</IconButton>
 					</form>
 
-					<TodoList todoList={todoList} />
+					<TodoList todoList={todoList} handleDeleteTodo={handleDeleteTodo} />
 				</Wrapper>
 			</AppContainer>
 		</>
