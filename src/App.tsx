@@ -7,9 +7,14 @@ import { useState, useRef, useCallback } from 'react';
 
 // Utils
 import { useForm } from 'react-hook-form';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 // API
-import { reqGetTodo } from './service/todo.api';
+import {
+	reqGetTodo,
+	reqAddTodo,
+	reqEditTodo,
+	reqDelTodo,
+} from './service/todo.api';
 
 // UI lib
 import {
@@ -25,43 +30,41 @@ import { Wrapper, TodoList } from '@/components';
 // Styled components
 import { AppContainer } from './App.style';
 
-const initTodoList: I_Todo[] = Array.from(Array(3).keys()).map(i => ({
-	id: i + 1,
-	title: 'Lorem ipsum dolor',
-	description:
-		'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Accusamus, natus ipsam eius perspiciatis eum commodi alias impedit ea at numquam. Repellat non quia voluptatum porro dicta iusto eius explicabo earum?',
-	status: 'Not Started',
-	createTime: '2022-11-14 16:41:00',
-}));
+// const initTodoList: I_Todo[] = Array.from(Array(3).keys()).map(i => ({
+// 	id: i + 1,
+// 	title: 'Lorem ipsum dolor',
+// 	description:
+// 		'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Accusamus, natus ipsam eius perspiciatis eum commodi alias impedit ea at numquam. Repellat non quia voluptatum porro dicta iusto eius explicabo earum?',
+// 	status: 'Not Started',
+// 	createTime: '2022-11-14 16:41:00',
+// }));
 
 export default function App() {
 	const { enqueueSnackbar } = useSnackbar();
-	const [todoList, setTodoList] = useState<I_Todo[]>(initTodoList);
+	const [todoList, setTodoList] = useState<I_Todo[]>([]);
 
-	const { data, status } = useQuery('testSet', reqGetTodo, {
+	const { status: resStatus } = useQuery('todo', reqGetTodo, {
 		retry: 0,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		refetchIntervalInBackground: false,
 		retryOnMount: false,
+
+		onSuccess(data) {
+			setTodoList(data);
+		},
 	});
-	console.log(data, status);
 
 	const { register, handleSubmit } = useForm();
 	const submitBtnRef = useRef<HTMLButtonElement>(null);
 
+	const mutationAdd = useMutation(reqAddTodo, {
+		onSuccess(newTodo) {
+			setTodoList(prevState => [...prevState, newTodo]);
+		},
+	});
 	const onSumbit = (data: FieldValues) => {
-		console.log('form data: ', data);
-
-		setTodoList(prevState => [
-			...prevState,
-			{
-				id: prevState.length + 1,
-				title: data.title,
-				status: 'Not Started',
-				createTime: Date.now().toString(),
-			},
-		]);
+		mutationAdd.mutate(data.title);
 	};
 	const onError = (errors: Object) => {
 		enqueueSnackbar(
@@ -74,8 +77,21 @@ export default function App() {
 		);
 	};
 
-	const handleDeleteTodo = useCallback((todoId: number) => {
-		setTodoList(prevState => prevState.filter(todo => todo.id !== todoId));
+	const mutationDel = useMutation(reqDelTodo, {
+		onSuccess(deletedTodo) {
+			setTodoList(prevState => {
+				return prevState.filter(todo => todo.id !== deletedTodo.id);
+			});
+		},
+		onError() {
+			enqueueSnackbar('Something went wrong...', {
+				autoHideDuration: 3000,
+				anchorOrigin: { horizontal: 'center', vertical: 'top' },
+			});
+		},
+	});
+	const handleDeleteTodo = useCallback(async (todoId: number) => {
+		mutationDel.mutate(todoId);
 	}, []);
 
 	return (
