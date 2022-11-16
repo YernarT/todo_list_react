@@ -60,7 +60,7 @@ export default memo(function Todo({ todo, handleDeleteTodo }: TodoProps) {
 							justifyContent: 'space-between',
 							alignItems: 'center',
 						}}>
-						<Typography>Create time: {todo.createTime}</Typography>
+						<Typography>Create time: {new Date(todo.createTime).toDateString()}</Typography>
 						<Chip label={todo.status} variant="outlined" />
 					</Box>
 				</ModalContainer>
