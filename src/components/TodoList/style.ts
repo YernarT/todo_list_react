@@ -24,4 +24,26 @@ export const TodoListStyled = styled(List)`
 	&::-webkit-scrollbar-thumb {
 		background-color: #1976d2;
 	}
+
+	.empty {
+		min-height: 140px;
+		border-radius: 4px;
+		border: 1px solid rgba(0, 0, 0, 0.23);
+
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		svg {
+			width: 40px;
+			height: 40px;
+			color: #999;
+		}
+
+		span {
+			font-size: 14px;
+			color: #999;
+		}
+	}
 `;

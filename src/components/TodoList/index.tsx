@@ -6,6 +6,7 @@ import { memo } from 'react';
 
 // Components
 import { Todo } from '@/components';
+import { OutboxOutlined } from '@mui/icons-material';
 
 // Styled Components
 import { TodoListStyled } from './style';
@@ -24,6 +25,13 @@ export default memo(function TodoList({
 			{todoList.map(todo => (
 				<Todo key={todo.id} todo={todo} handleDeleteTodo={handleDeleteTodo} />
 			))}
+			{/* When list is empty */}
+			{todoList.length === 0 && (
+				<div className="empty">
+					<OutboxOutlined />
+					<span>List is empty</span>
+				</div>
+			)}
 		</TodoListStyled>
 	);
 });
