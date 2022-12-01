@@ -1,13 +1,12 @@
 // Types
-import type { FieldValues } from 'react-hook-form';
+import type { AlertColor } from '@mui/material';
 import type { I_Todo } from './types/todo';
 
 // React
 import { useState, useRef, useCallback } from 'react';
 
-// Utils
-import { useForm } from 'react-hook-form';
-import { useQuery, useMutation } from 'react-query';
+// Hooks
+import { useSetState } from 'ahooks';
 // API
 import {
 	reqGetTodo,
@@ -22,9 +21,10 @@ import {
 	Typography,
 	IconButton,
 	OutlinedInput,
+	Snackbar,
+	Alert,
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
 // Components
 import { Wrapper, TodoList } from '@/components';
 // Styled components
@@ -40,65 +40,60 @@ import { AppContainer } from './App.style';
 // }));
 
 export default function App() {
-	const { enqueueSnackbar } = useSnackbar();
-	const [todoList, setTodoList] = useState<I_Todo[]>([]);
-
-	const { status: resStatus } = useQuery('todo', reqGetTodo, {
-		retry: 0,
-		refetchOnWindowFocus: false,
-		refetchOnMount: false,
-		refetchIntervalInBackground: false,
-		retryOnMount: false,
-
-		onSuccess(data) {
-			setTodoList(data);
-		},
+	interface I_State {
+		todoList: I_Todo[];
+		todoTitle: string;
+		snackbarIsOpen: boolean;
+		snackbarSeverity: AlertColor;
+		snackbarText: string;
+	}
+	const [state, setState] = useSetState<I_State>({
+		todoList: [],
+		todoTitle: '',
+		snackbarIsOpen: false,
+		snackbarSeverity: 'error',
+		snackbarText: '',
 	});
 
-	const { register, handleSubmit } = useForm();
-	const submitBtnRef = useRef<HTMLButtonElement>(null);
-
-	const mutationAdd = useMutation(reqAddTodo, {
-		onSuccess(newTodo) {
-			setTodoList(prevState => [...prevState, newTodo]);
-		},
-	});
-	const onSumbit = (data: FieldValues) => {
-		mutationAdd.mutate(data.title);
-	};
-	const onError = (errors: Object) => {
-		enqueueSnackbar(
-			(Object.values(errors)[0]?.message ||
-				'Something went wrong...') as string,
-			{
-				autoHideDuration: 3000,
-				anchorOrigin: { horizontal: 'center', vertical: 'top' },
-			},
-		);
-	};
-
-	const mutationDel = useMutation(reqDelTodo, {
-		onSuccess(deletedTodo) {
-			setTodoList(prevState => {
-				return prevState.filter(todo => todo.id !== deletedTodo.id);
+	const handleAdd = () => {
+		if (state.todoTitle === '') {
+			setState({
+				snackbarIsOpen: true,
+				snackbarText: 'Title is required',
 			});
-		},
-		onError() {
-			enqueueSnackbar('Something went wrong...', {
-				autoHideDuration: 3000,
-				anchorOrigin: { horizontal: 'center', vertical: 'top' },
-			});
-		},
-	});
-	const handleDeleteTodo = useCallback(async (todoId: number) => {
-		mutationDel.mutate(todoId);
-	}, []);
+			return;
+		}
+
+		let newTodo = {
+			title: state.todoTitle,
+		};
+
+		setState(prevState => ({
+			...prevState,
+			todoList: [...prevState.todoList, newTodo],
+		}));
+	};
 
 	return (
 		<>
 			<CssBaseline />
 
 			<AppContainer>
+				<Snackbar
+					open={state.snackbarIsOpen}
+					autoHideDuration={2000}
+					onClose={() => setState({ snackbarIsOpen: false })}
+					anchorOrigin={{
+						vertical: 'top',
+						horizontal: 'center',
+					}}>
+					<Alert
+						onClose={() => setState({ snackbarIsOpen: false })}
+						severity={state.snackbarSeverity}>
+						{state.snackbarText}
+					</Alert>
+				</Snackbar>
+
 				<Wrapper>
 					{/* Header */}
 					<Typography variant="h4" noWrap fontWeight="bolder" gutterBottom>
@@ -106,29 +101,23 @@ export default function App() {
 					</Typography>
 
 					{/* Create Todo */}
-					<form className="toolbar" onSubmit={handleSubmit(onSumbit, onError)}>
+					<div className="toolbar">
 						<OutlinedInput
 							placeholder="Add your new todo"
 							size="small"
 							className="input"
-							{...register('title', {
-								required: {
-									value: true,
-									message: 'Title is required',
-								},
-								maxLength: {
-									value: 32,
-									message: 'Title maximum length is 32 characters',
-								},
-							})}
+							value={state.todoTitle}
+							onChange={({ target: { value } }) =>
+								setState({ todoTitle: value })
+							}
 						/>
 
-						<IconButton color="primary" ref={submitBtnRef} type="submit">
+						<IconButton color="primary" onClick={handleAdd}>
 							<AddIcon />
 						</IconButton>
-					</form>
+					</div>
 
-					<TodoList todoList={todoList} handleDeleteTodo={handleDeleteTodo} />
+					<TodoList todoList={state.todoList} />
 				</Wrapper>
 			</AppContainer>
 		</>
